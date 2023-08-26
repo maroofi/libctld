@@ -66,5 +66,27 @@ int main(int argc, char ** argv){
 - ctld_result * ctld_parse(ctld\_ctx *ctx, char *domain, int use\_private\_suffix)
 
 
+### ctld binary file
 
+After making the project, the binary file generated in the bin directory named __ctld__. 
+This is a command line tool for parsing and working with domain names in bash.
+The input to the command-line tool can be a fqdn, domain or URL.
+
+Here is the supported options for the binary.
+```bash
+bash:~$ ctld -h
+[Help]
+
+Summary:
+cTLD: Top Level Domain parser based on Public Suffix List (psl).
+
+ctld [OPTIONS] FILE	
+	     --tld 	Print suffix
+	     --rd 	Print registered domain
+	     --fqdn 	Print fully-qualified-domain-name
+	     --private 	Use private suffix list as well
+	     --err 	Print Errors only
+	-h , --help 	Print this help message
+	-v , --version 	Print suffix
+```
 
