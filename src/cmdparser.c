@@ -6,7 +6,6 @@
 
 
 static PARG_PARSED_ARGS realloc_memory(PARG_PARSED_ARGS parsed, const char * tag, const char * val);
-static int _check_cmdline_sanity(PARG_PARSED_ARGS parsed, PARG_CMDLINE pcmd);
 
 
 // return value: 0: not set, 1: set
@@ -34,31 +33,6 @@ const char * arg_get_tag_value(PARG_PARSED_ARGS pa, const char * tag){
     return NULL;
 }
 
-
-/* Checks if all the required options are there in the 
- * parsed answer
- * */
-static int _check_cmdline_sanity(PARG_PARSED_ARGS parsed, PARG_CMDLINE pcmd){
-
-    int found = 0;
-
-    PARG_PARSED_ARGS tmp_parsed = parsed != NULL? parsed:NULL; 
-    PARG_CMD_OPTION tmp_cmdoption = pcmd != NULL && pcmd->cmd_option != NULL? pcmd->cmd_option:NULL;
-    if (NULL == tmp_cmdoption){return 0; /*everything is fine since we don't have any argument to parse*/}
-    
-    while (tmp_cmdoption->tag != NULL){
-        tmp_parsed = parsed;
-        if (tmp_cmdoption->has_param){
-            // TODO
-            // check if the parsed structure has param for this tag
-            continue;
-        }else{
-            // TODO: return error
-        }
-        tmp_cmdoption++;
-    }
-    return 0; /*everything is fine*/
-}
 
 
 static int is_valid_long_without_param(PARG_CMDLINE pcmd, char * arg){
@@ -157,7 +131,6 @@ PARG_PARSED_ARGS arg_parse_arguments(PARG_CMDLINE pcmd, int argc, char ** argv, 
     char * prev_tag = NULL;
     char tmp_mem[200] = {0};
     j = 1;   // start iterating over args
-    int error_found = ARG_SUCCESS;
     while (j < argc){
         char * arg = argv[j];
         if (arg[0] == '-'){

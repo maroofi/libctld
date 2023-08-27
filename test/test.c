@@ -76,6 +76,10 @@ int test(){
                   "amazonaws.com", "amazonaws", "com");
     assert_expect(ctx, 1, "s3.cn-north-1.amazonaws.com.cn", NULL, NULL, NULL, "s3.cn-north-1.amazonaws.com.cn");
     assert_expect(ctx, 1, "amazonaws.com.cn", "amazonaws.com.cn", "amazonaws.com.cn", "amazonaws", "com.cn");
+
+    assert_expect(ctx, 1, "data.shit.yokohama.jp", "data.shit.yokohama.jp", "data.shit.yokohama.jp", "data", "shit.yokohama.jp");
+    assert_expect(ctx, 1, "city.kawasaki.jp", "city.kawasaki.jp", "city.kawasaki.jp", "city", "kawasaki.jp");
+    assert_expect(ctx, 1, "shit.yokohama.jp", NULL, NULL, NULL, "shit.yokohama.jp");
     
     // won't pass this test since we don't convert the input, user can convert it before passing to the library
     //assert_expect(ctx, 0, "angelinablog。com.de", "angelinablog。com.de", "com.de", "com", "de");

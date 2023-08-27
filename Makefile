@@ -1,5 +1,5 @@
 CC := gcc
-CFLAGS := -I./include
+CFLAGS := -I./include -Wall
 CLIBS := -lidn2
 SHELL = /bin/bash
 
