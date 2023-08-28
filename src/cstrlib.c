@@ -105,9 +105,9 @@ void str_free(PSTR pstr){
 int str_any_of_in(PSTR pstr, const char * characters){
     if (characters == NULL)
         return 0;
-    if (strlen(characters) == 0 || !pstr || pstr->len == 0)
-        return 0;
     unsigned long int charlen = strlen(characters);
+    if (charlen == 0 || !pstr || pstr->len == 0)
+        return 0;
     for (unsigned long int i=0; i<charlen; ++i){
         for (unsigned long int j=0; j< pstr->len; ++j){
             if (characters[i] == pstr->str[j])
@@ -125,11 +125,12 @@ int str_any_of_in(PSTR pstr, const char * characters){
  * @param oldval The old substring to work on
  * @param newval The new substring to replce
  * @param count The number of replacement (-1 means all occurrence must be replaced)
- * @return char * on success or NULL if fails. 
+ * @return char * on success or NULL if fails.
+ *
  * **User is responsible to free the 
  *  memory allocated for the return value (allocated by malloc)**.
  *
- * The behaviour of this function is the same as _python3_ reverse() function.
+ * The behaviour of this function is the same as _python3_ replace() function.
  */
 char * str_replace(PSTR pstr, const char * oldval, const char * newval, int count){
     if (pstr == NULL)
@@ -147,33 +148,34 @@ char * str_replace(PSTR pstr, const char * oldval, const char * newval, int coun
 #ifdef DEBUG
     printf("We passed the initial checks...\n");
 #endif
-    // a = ""; a.replace("", "shit") -> shit
-    if (pstr->len == 0 && strlen(oldval) == 0){
+    size_t new_val_len = strlen(newval);
+    size_t old_val_len = strlen(oldval);
+    if (pstr->len == 0 && old_val_len == 0){
         // return newval
-        char * new_str = (char *) malloc(sizeof(char) * strlen(newval) + 1);
+        char * new_str = (char *) malloc(sizeof(char) * new_val_len + 1);
         if (NULL == new_str){
             pstr->err = ERROR_CAN_NOT_ALLOCATE_MEMORY;
             strcpy(pstr->errmsg, "Can not allocate memory!");
             return NULL;
         }
-        strncpy(new_str, newval, strlen(newval));
-        new_str[strlen(newval)] = '\0';
+        memcpy(new_str, newval, new_val_len);
+        new_str[new_val_len] = '\0';
         return new_str;
     }
-    if (strlen(oldval) == 0 && strlen(newval) == 0){
+    if (old_val_len == 0 && new_val_len == 0){
         //return the original string
         return str_copy(pstr);
     }
-    if (strlen(oldval) == 0){
+    if (old_val_len == 0){
         // copy newval before and after of each char in original string
         size_t new_size = (pstr->len) + 1;
         if (count == -1){
-            new_size += (pstr->len -1 + 2) * strlen(newval);
+            new_size += (pstr->len -1 + 2) * new_val_len;
         }else{
             if (count <= pstr->len -1 + 2){
-                new_size += count * strlen(newval);
+                new_size += count * new_val_len;
             }else{
-                new_size += (pstr->len -1 + 2) * strlen(newval);
+                new_size += (pstr->len -1 + 2) * new_val_len;
             }
         }
         char * new_str = (char *) malloc(sizeof(char) * new_size);
@@ -182,17 +184,18 @@ char * str_replace(PSTR pstr, const char * oldval, const char * newval, int coun
             strcpy(pstr->errmsg, "Can not allocate memory!");
             return NULL;
         }
+        memset(new_str, 0, new_size);
         int cnt = 0;
         if (count != 0){
-            strncpy(new_str, newval, strlen(newval));
+            memcpy(new_str, newval, new_val_len);
             cnt++;
         }else{
-            strncpy(new_str, pstr->str, pstr->len);
+            memcpy(new_str, pstr->str, pstr->len);
         }
         if (count == 0){
             return new_str;
         }
-        unsigned int j = strlen(newval);
+        unsigned int j = new_val_len;
         char * tmp = (char *)newval;
         for (unsigned int i=0;i<pstr->len; ++i){
             tmp = (char*)newval;
@@ -221,8 +224,8 @@ char * str_replace(PSTR pstr, const char * oldval, const char * newval, int coun
 
     int start = 0;
     int replace_count = 0;
-    size_t oldval_len = strlen(oldval);
-    size_t newval_len = strlen(newval);
+    size_t oldval_len = old_val_len;
+    size_t newval_len = new_val_len;
     char * new_pos = NULL;
     while (1){
         new_pos = strstr(pstr->str + start, oldval);
@@ -711,7 +714,7 @@ char * str_reverse(PSTR pstr){
     if (pstr->str == NULL)
         return NULL;
     char * new_str = NULL;
-    new_str = (char*) malloc(pstr->len * sizeof(char) + 1);
+    new_str = malloc(pstr->len * sizeof(char) + 1);
     if (new_str == NULL){
         pstr->err = ERROR_CAN_NOT_ALLOCATE_MEMORY;
         strcpy(pstr->errmsg, "Can not allocate memory!");
@@ -928,7 +931,7 @@ int str_append_string(PSTR pstr, char * string){
 #endif
     pstr->st_memory = tmp;
     pstr->str = tmp;
-    strncpy(pstr->str + pstr->len, string, new_str_len);
+    memcpy(pstr->str + pstr->len, string, new_str_len);
     pstr->str[pstr->len + new_str_len] = '\0';
     pstr->len = pstr->len + new_str_len;
     return 0;
@@ -952,8 +955,8 @@ int str_prepend_string(PSTR pstr, char * string){
         strcpy(pstr->errmsg, "Can not allocate memory!");
         return 1;
     }
-    strncpy(tmp, string, new_str_len);
-    strncpy(tmp + new_str_len, pstr->str, pstr->len);
+    memcpy(tmp, string, new_str_len);
+    memcpy(tmp + new_str_len, pstr->str, pstr->len);
     tmp[pstr->len + new_str_len] = '\0';
     pstr->str_setval(pstr, tmp);
     free(tmp);
