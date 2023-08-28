@@ -147,8 +147,8 @@ static unsigned int hashme(cdict_ctx * ctx, char * key){
     j=1;
     for (unsigned int i=0; i< strlen(key); ++i){
         j *= (WORD)key[i];
+        j = (j % (TABLE_SIZE)) & 0xFFFF;
     }
-    j = (j % TABLE_SIZE) & (0xFFFF);
     return ctx->hash_table[j];
 }
 
@@ -499,7 +499,10 @@ int cdict_has_key_nocase(cdict_ctx* ctx, char * key){
  *
  * @return Nothing
  */
-void cdict_free_keylist(cdict_keylist* klst){
+void cdict_free_keylist(cdict_keylist* klst, int clone_keys){
+    if (clone_keys)
+        for (unsigned int i=0; i< klst->len; ++i)
+            free(klst->lst[i]);
     free(klst->lst);
     free(klst);
     return;
@@ -510,23 +513,28 @@ void cdict_free_keylist(cdict_keylist* klst){
 /**
  * @brief Get the list of keys from the dictionary
  * @param dict The dictionary to set the key-value in
- * @param length a pointer to an unsigned long int
+ * @param clone_keys pass 1 if you want to get a copy of the keys or 0 to return a pointer to keys
+ *
+ * if clone_keys is 1, then the function will copy all the internal keys using strdup().
+ * This means that users must free the return cdict_keylist result by calling 
+ * cdict_free_keylist() and setting the clone_keys to 1.
+ * 
+ * This method is good for removing key-value from a dictionary in a loop.
+ *
  * @return returns a char** array (User is responsible to free the key list by calling free() function)
  */
-cdict_keylist * cdict_keys(cdict_ctx* ctx){
+cdict_keylist * cdict_keys(cdict_ctx* ctx, int clone_keys){
     unsigned long int cnt = 0;
     PNODE tmp = NULL;
     for (unsigned long int i=0; i< TABLE_SIZE; i++){
         if (ctx->table[i].key != NULL){
             cnt += 1;
             tmp = ctx->table[i].next;
-            while(tmp != NULL){
+            while(tmp && tmp->key){
                 cnt += 1;
                 tmp = tmp->next;
             }
-        }else{
-            continue;
-        } 
+        }
     }
     cdict_keylist *klst = (cdict_keylist*) malloc(sizeof(cdict_keylist));
     if (!klst){
@@ -534,11 +542,9 @@ cdict_keylist * cdict_keys(cdict_ctx* ctx){
         strcpy(ctx->errmsg, "Can not allocate memory for keys");
         return NULL;
     }
-
-    if (cnt == 0){
-        klst->len = 0;
+    klst->len = cnt;
+    if (cnt == 0)
         return klst;
-    }
     // allocate cnt * (sizeof(char *))
     klst->lst = (char**) malloc (cnt * sizeof(char*));
     if (NULL == klst->lst){
@@ -548,21 +554,18 @@ cdict_keylist * cdict_keys(cdict_ctx* ctx){
         return NULL;
     }
     tmp = NULL;
-    klst->len = cnt;
     cnt = 0;
     ctx->err = ERROR_OK;
     for (unsigned long int i=0; i< TABLE_SIZE; ++i){
         if (ctx->table[i].key != NULL){
-            klst->lst[cnt] = ctx->table[i].key;
+            klst->lst[cnt] = clone_keys?strdup(ctx->table[i].key):ctx->table[i].key;
             cnt += 1;
             tmp = ctx->table[i].next;
-            while (tmp != NULL){
-                klst->lst[cnt] = tmp->key;
+            while (tmp && tmp->key){
+                klst->lst[cnt] = clone_keys?strdup(tmp->key):tmp->key;
                 cnt += 1;
                 tmp = tmp->next;
             }
-        }else{
-            continue;
         }
     }
     return klst;

@@ -61,8 +61,8 @@ int cdict_set_nocase(cdict_ctx *ctx, char * key, void * value);
 void * cdict_get(cdict_ctx*, char *);
 void * cdict_get_nocase(cdict_ctx* ctx, char * key);
 int cdict_set(cdict_ctx*, char *, void *);
-void cdict_free_keylist(cdict_keylist*);
-cdict_keylist * cdict_keys(cdict_ctx *ctx);
+void cdict_free_keylist(cdict_keylist*, int);
+cdict_keylist * cdict_keys(cdict_ctx *ctx, int clone_keys);
 int cdict_has_key(cdict_ctx*, char * key);
 void cdict_remove(cdict_ctx *, char *);
 /*end of function definitions*/
