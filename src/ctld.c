@@ -122,6 +122,7 @@ int main(int argc, char ** argv){
     char * input_buffer = NULL;
     int should_encode = 0;
     while ((n = getline(&l, &m, fp)) != -1){
+        idn_result = 0;
         should_encode = 0;
         if (n == 0){
             continue;
