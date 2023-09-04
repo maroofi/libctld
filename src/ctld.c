@@ -29,6 +29,7 @@ int main(int argc, char ** argv){
         {.short_option=0, .long_option = "fqdn", .has_param = NO_PARAM, .help="Print fully-qualified-domain-name", .tag="print_fqdn"},
         {.short_option=0, .long_option = "private", .has_param = NO_PARAM, .help="Use private suffix list as well", .tag="use_private"},
         {.short_option=0, .long_option = "err", .has_param = NO_PARAM, .help="Print Errors only", .tag="print_err"},
+        {.short_option=0, .long_option = "custom", .has_param = HAS_PARAM, .help="Add a comma-separated list of custom suffixes (no space)", .tag="custom_suffix"},
         {.short_option='h', .long_option = "help", .has_param = NO_PARAM, .help="Print this help message", .tag="print_help"},
         {.short_option='v', .long_option = "version", .has_param = NO_PARAM, .help="Print suffix", .tag="print_version"},
         {.short_option=0, .long_option = "", .has_param = NO_PARAM, .help="", .tag=NULL}
@@ -55,9 +56,14 @@ int main(int argc, char ** argv){
     use_private = arg_is_tag_set(pargs, "use_private")?1:0;
     print_err = arg_is_tag_set(pargs, "print_err")?1:0;
     char * filename = cmd.extra?cmd.extra:NULL;
+    char * custom_suffix = NULL;
+    if (arg_is_tag_set(pargs, "custom_suffix")){
+        custom_suffix = strdup(arg_get_tag_value(pargs, "custom_suffix"));
+    }
     // we don't need pargs anymore, we can free the memory
     // just make valgrind shutup
     arg_free(pargs);
+
     FILE * fp = NULL;
     if (filename){
         fp = fopen(filename, "r");
@@ -85,6 +91,26 @@ int main(int argc, char ** argv){
     if (!ctx){
         fprintf(stderr, "Can not create the context for public suffix list!\n");
         return 2;
+    }
+    // add custom suffix if any
+    if (custom_suffix){
+        PSTR str = str_init(custom_suffix);
+        free(custom_suffix);
+        if (str){
+            char * stripped = NULL;
+            PSPLITLIST splt = str->str_split(str, ",", -1);
+            for (int i=0; i< splt->len; ++i){
+                str->str_setval(str, splt->list[i]);
+                stripped = str->str_strip(str, NULL);
+                if (stripped){
+                    ctld_add_custom_suffix(ctx, stripped);
+                    free(stripped);
+                    stripped = NULL;
+                }
+            }
+            str_free(str);
+            str_free_splitlist(splt);
+        }
     }
     size_t m = 0;
     size_t n = 0;

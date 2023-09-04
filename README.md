@@ -65,6 +65,7 @@ int main(int argc, char ** argv){
  
 - ctld_result * ctld_parse(ctld\_ctx *ctx, char *domain, int use\_private\_suffix)
 
+- int ctld\_add\_custom\_suffix(ctld\_ctx *ctx, char * suffix)
 
 ### ctld binary file
 
@@ -80,12 +81,13 @@ bash:~$ ctld -h
 Summary:
 cTLD: Top Level Domain parser based on Public Suffix List (psl).
 
-ctld [OPTIONS] FILE	
+ctld [OPTIONS] FILE
 	     --tld 	Print suffix
 	     --rd 	Print registered domain
 	     --fqdn 	Print fully-qualified-domain-name
 	     --private 	Use private suffix list as well
 	     --err 	Print Errors only
+	     --custom=<param>	Add a comma-separated list of custom suffixes (no space)
 	-h , --help 	Print this help message
 	-v , --version 	Print suffix
 ```

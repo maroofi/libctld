@@ -334,6 +334,43 @@ static int ctld_parse_list(char * data, cdict_ctx* list_public, cdict_ctx* list_
 }
 
 
+/**
+ * @brief Adds custom suffix to the public part of PSL
+ * @param ctx Context returned by ctld_parse_file() or ctld_parse_string()
+ * @param suffix your new suffix to add to the suffix list
+ * 
+ * Why you should add custom suffix to the list?
+ * Sometimes the suffix is not in the PSL list (at least not in the public part)
+ * but it has a separate WHOIS server. You may want to distinguish those suffixes
+ * and treat them like they are public suffixes. In this case, you can use this 
+ * function to add whatever suffix you want.
+ *
+ * @return 0 on success or other values on failure
+ *
+ * Possible error values:
+ *  - 1 if context or suffix is NULL or empty
+ *  - 2 if suffix already exists in the public part of PSL
+ *  - 3 if allocation function(malloc()) failed
+ *
+ */
+int ctld_add_custom_suffix(ctld_ctx * ctx, char * suffix){
+    if (!ctx || !suffix || strlen(suffix) == 0)
+        return 1;
+    if (cdict_get_nocase(ctx->list_public, suffix) != NULL)
+        return 2;       // we already have it
+    // we don't have it let's add it
+    // TODO:
+    struct ctld_node * new_node = (struct ctld_node*) malloc(sizeof(struct ctld_node));
+    if (!new_node){
+        return 3;
+    }
+    new_node->is_private = 0;
+    new_node->has_priority = 0;
+    new_node->name = strdup(suffix);
+    cdict_set(ctx->list_public, new_node->name, (void*) new_node);
+    return 0;
+}   
+
 
 /**
  * @brief free the memory used by ctld_result structure

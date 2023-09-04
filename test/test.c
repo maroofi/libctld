@@ -84,7 +84,9 @@ int test(){
     // won't pass this test since we don't convert the input, user can convert it before passing to the library
     //assert_expect(ctx, 0, "angelinablog。com.de", "angelinablog。com.de", "com.de", "com", "de");
     //assert_expect(ctx, 1, "angelinablog。com.de", "angelinablog。com.de", "angelinablog。com.de", "angelinablog", "com.de");
-    
+    // let's add a custom suffix to see we can parse it
+    ctld_add_custom_suffix(ctx, "imaginerysuffix");
+    assert_expect(ctx, 0, "shit.test.domain.imaginerysuffix", "shit.test.domain.imaginerysuffix", "domain.imaginerysuffix", "domain", "imaginerysuffix");
     //free the memory (but it's not necessary!)
     ctld_free(ctx);
     return 0;

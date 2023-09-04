@@ -316,7 +316,7 @@ void arg_show_help(PARG_CMDLINE cmd, int argc, char ** argv){
        int put_ddash = strcmp(tmp->long_option, "") == 0?0:1;
        char virgul = has_shrt && put_ddash?',':' ';
        char * pddash = put_ddash?ddash:"\t";
-       fprintf(stdout, "\t%c%c %s%c %s%s%c%s\t%s\n",dash, shrt, check_param, virgul,pddash, tmp->long_option, equal, check_param, tmp->help);
+       fprintf(stdout, "\t%c%c %s%c %s%s%c%s\t%s\n",dash, shrt, has_shrt?check_param:"", virgul,pddash, tmp->long_option, equal, check_param, tmp->help);
        tmp++;
     }   
 }

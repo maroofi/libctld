@@ -71,3 +71,4 @@ int ctld_is_domain_valid(char * domain);
 void ctld_free(ctld_ctx*);
 ctld_ctx * ctld_parse_file(char * filename);
 ctld_result * ctld_parse(ctld_ctx * ctx, char * domain, int use_private_suffix);
+int ctld_add_custom_suffix(ctld_ctx * ctx, char * suffix);
