@@ -117,13 +117,14 @@ int main(int argc, char ** argv){
     ctld_result * result = NULL;
     struct parsed_url * purl = NULL;
     int include_private = use_private;
-    char * idn_out;
+    char * idn_out = NULL;
     int idn_result = 0;
     char * input_buffer = NULL;
     int should_encode = 0;
     while ((n = getline(&l, &m, fp)) != -1){
         idn_result = 0;
         should_encode = 0;
+        idn_out = NULL;
         if (n == 0){
             continue;
         }
@@ -143,20 +144,25 @@ int main(int argc, char ** argv){
                 }
             }
             if (should_encode){
-                idn_result = idn2_to_ascii_8z(input_buffer, &idn_out, IDN2_NONTRANSITIONAL);
+                idn_result = idna_to_ascii_8z(input_buffer, &idn_out, IDN2_NONTRANSITIONAL);
+                parsed_url_free(purl);
                 input_buffer = idn_out;
             }else{
-                input_buffer = l;
+                input_buffer = purl->host;
             }
             if (idn_result == IDN2_OK){
                 result = ctld_parse(ctx, input_buffer, include_private);
-                parsed_url_free(purl);
                 if (should_encode)
                     free(input_buffer);
+                else
+                    parsed_url_free(purl);
             }else{
                 if (print_err){
                     fprintf(stderr, "ERROR: Can not parse IDN domain: %s\n", purl->host);
-                    parsed_url_free(purl);
+                    if (should_encode)
+                        free(input_buffer);
+                    else
+                        parsed_url_free(purl);
                     continue;
                 }
             }
@@ -169,28 +175,30 @@ int main(int argc, char ** argv){
                 }
             }
             if (should_encode){
-                idn_result = idn2_to_ascii_8z(l, &idn_out, IDN2_NONTRANSITIONAL);
+                idn_result = idna_to_ascii_8z(l, &idn_out, IDN2_NONTRANSITIONAL);
                 input_buffer = idn_out;
             }else{
                 input_buffer = l;
             }
             if (idn_result == IDN2_OK){
                 result = ctld_parse(ctx, input_buffer, include_private);
+
                 if (should_encode)
                     free(input_buffer);
             }else{
+                input_buffer = NULL;
                 if (print_err){
-                    fprintf(stderr, "ERROR: Can not parse IDN domain: %s\n", input_buffer);
+                    fprintf(stderr, "ERROR: Can not parse IDN domain: %s\n", l);
+                    if (should_encode)
+                        free(input_buffer);
                     continue;
                 }
             }
         }
         if (!result && print_err){
             fprintf(stderr, "ERROR: Can not parse: %s\n", l);
-            free(l);
             continue;
         }else if (!result && !print_err){
-            free(l);
             continue;
         }
         int p = 0;
@@ -214,8 +222,7 @@ int main(int argc, char ** argv){
             printf("\n");
         }
         ctld_result_free(result);
-        free(l);
-        l = NULL;
+        result = NULL;
     }
     free(l);
     ctld_free(ctx);
