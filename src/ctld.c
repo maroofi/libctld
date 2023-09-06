@@ -138,7 +138,7 @@ int main(int argc, char ** argv){
             input_buffer = purl->host;
             n = 0;
             while(input_buffer[n]){
-                if (input_buffer[n++] > 127){
+                if ((unsigned char)input_buffer[n++] > 127){
                     should_encode = 1;
                     break;
                 }
