@@ -21,7 +21,7 @@ test: dummy $(OBJSTEST) $(HDEPS) test.o
 	echo "Executing test rules...."
 	$(CC) $(CFLAGS) $(addprefix bin/, $(OBJSTEST)) -o bin/test $(CLIBS)
 	./bin/test
-	./bin/test.sh
+	./test/test.sh
 
 cdict.o: src/cdict.c include/cdict.h
 	$(CC) $(CFLAGS) -fPIC -c $< -o bin/$@
