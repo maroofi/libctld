@@ -27,6 +27,7 @@ int main(int argc, char ** argv){
         {.short_option=0, .long_option = "tld", .has_param = NO_PARAM, .help="Print suffix", .tag="print_tld"},
         {.short_option=0, .long_option = "rd", .has_param = NO_PARAM, .help="Print registered domain", .tag="print_rd"},
         {.short_option=0, .long_option = "fqdn", .has_param = NO_PARAM, .help="Print fully-qualified-domain-name", .tag="print_fqdn"},
+        {.short_option=0, .long_option = "domain", .has_param = NO_PARAM, .help="Print effective 2nd level label", .tag="print_domain"},
         {.short_option=0, .long_option = "private", .has_param = NO_PARAM, .help="Use private suffix list as well", .tag="use_private"},
         {.short_option=0, .long_option = "err", .has_param = NO_PARAM, .help="Print Errors only", .tag="print_err"},
         {.short_option=0, .long_option = "custom", .has_param = HAS_PARAM, .help="Add a comma-separated list of custom suffixes (no space)", .tag="custom_suffix"},
@@ -41,7 +42,7 @@ int main(int argc, char ** argv){
         arg_show_help(&cmd, argc, argv);
         return 1;
     }
-    int print_tld, print_rd, print_fqdn, use_private, print_err;
+    int print_tld, print_rd, print_fqdn, print_domain, use_private, print_err;
     if (arg_is_tag_set(pargs, "print_help")){
         arg_show_help(&cmd, argc, argv);
         return 0;
@@ -53,6 +54,7 @@ int main(int argc, char ** argv){
     print_tld = arg_is_tag_set(pargs, "print_tld")?1:0;
     print_rd = arg_is_tag_set(pargs, "print_rd")?1:0;
     print_fqdn = arg_is_tag_set(pargs, "print_fqdn")?1:0;
+    print_domain = arg_is_tag_set(pargs, "print_domain")?1:0;
     use_private = arg_is_tag_set(pargs, "use_private")?1:0;
     print_err = arg_is_tag_set(pargs, "print_err")?1:0;
     char * filename = cmd.extra?cmd.extra:NULL;
@@ -75,7 +77,7 @@ int main(int argc, char ** argv){
         return 1;
     }
     // set this as the default option
-    if (print_rd == 0 && print_tld == 0 && print_fqdn == 0)
+    if (print_rd == 0 && print_tld == 0 && print_fqdn == 0 && print_domain == 0)
         print_rd = 1;
 
     char * l = NULL;
@@ -217,6 +219,12 @@ int main(int argc, char ** argv){
                 if (p)
                     printf("\t");
                 PRINTIFSET(result->suffix);
+                p++;
+            }
+             if (print_domain){
+                if (p)
+                    printf("\t");
+                PRINTIFSET(result->domain);
                 p++;
             }
             printf("\n");
