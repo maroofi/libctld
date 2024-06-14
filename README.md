@@ -8,6 +8,9 @@ C Library to parse public suffix list (PSL)
 Before compiling the library, you must update PSL data (psl.dat file)
 by downloading the latest file from [here](https://publicsuffix.org/list/)
 
+### Documentation
+
+See the full documentation [here](https://maroofi.github.io/libctld)
 
 ### Compile and test
 ```bash
