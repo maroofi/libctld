@@ -9,3 +9,7 @@ test $(echo "http://xn--npth-5q5a1g.nạpthẻ.vn/app" | ./bin/ctld --rd) == 'xn
 
 test $(echo "nạpthẻ.vn" | ./bin/ctld --rd) == 'xn--npth-5q5a1g.vn' || echo $FAIL
 test $(echo "xn--npth-5q5a1g.nạpthẻ.vn" | ./bin/ctld --rd) == 'xn--npth-5q5a1g.vn' || echo $FAIL
+
+test $(echo "xn--npth-5q5a1g.nạpthẻ.vn" | ./bin/ctld --domain) == 'xn--npth-5q5a1g' || echo $FAIL
+test $(echo "https://freefire.xn--npth-5q5a1g.vn/app" | ./bin/ctld --domain) == 'xn--npth-5q5a1g' || echo $FAIL
+test $(echo "https://test.vic.edu.au/app" | ./bin/ctld --domain) == 'test' || echo $FAIL

@@ -89,6 +89,7 @@ ctld [OPTIONS] FILE
 	     --rd 	Print registered domain
 	     --fqdn 	Print fully-qualified-domain-name
 	     --private 	Use private suffix list as well
+         --domain   Print effective 2nd level label
 	     --err 	Print Errors only
 	     --custom=<param>	Add a comma-separated list of custom suffixes (no space)
 	-h , --help 	Print this help message
