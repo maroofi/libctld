@@ -128,8 +128,15 @@ int main(int argc, char ** argv){
         if (n == 0){
             continue;
         }
-        if (n > 0 && l[n -1] == '\n')
-            l[n -1] = '\0';
+        int t = n;
+        while (t >= 0){
+            if (l[t-1] == 0x0D || l[t-1] == 0x20 || l[t-1] == 0x0A || l[t-1] == '.'){
+                l[t-1] = '\0';
+                t -= 1;
+            }else{
+                break;
+            }
+        }
         if (l[0] == '\0'){
             continue;
         }
