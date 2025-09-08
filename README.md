@@ -54,6 +54,44 @@ int main(int argc, char ** argv){
 }
 ```
 
+### Using the library in Lua
+
+If you want to compile the code and use the module in Lua, use the following command to compile it.
+
+```bash
+gcc -c -Wall -Werror -shared -fpic -Wl,-E src/lua_libctld.c src/libctld.c src/cstrlib.c src/clist.c src/cdict.c -I./include -I/usr/include/lua5.4 && gcc -shared -o libctld.so *.o -llua5.4 -lm -lidn2 && rm -f *.o
+```
+
+Here is an example of using the library in lua:
+
+```lua
+-- you must have psl.data file in this directory
+-- you must have libctld.so in this directory
+
+psl = require "libctld"
+inspect = require "inspect"
+p = psl.init("psl.dat")
+result, err, msg = psl.parse(p, "google.com", 0)
+
+print(inspect(result))
+print(inspect(err))
+print(inspect(msg))
+
+--[[
+
+    {
+      domain = "google",
+      fqdn = "google.com",
+      registered_domain = "google.com",
+      suffix = "com"
+    }
+    nil
+    nil
+
+]]
+```
+
+
 ### Exposed API
 
 - void ctld\_result\_free(ctld\_result *res)
